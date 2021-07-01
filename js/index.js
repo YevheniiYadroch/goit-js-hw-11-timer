@@ -1,29 +1,74 @@
-const timer = new CountdownTimer({
+class CountdownTimer {
+  constructor({selector, targetDate}) {
+    this.timerId = selector;
+    this.targetDate = targetDate.getTime();
+  }
+
+  template = (timerId) => `
+     <div class="timer" id="${timerId}">
+        <div class="field">
+            <span class="value" data-value="days">0</span>
+            <span class="label">Days</span>
+        </div>
+    
+        <div class="field">
+            <span class="value" data-value="hours">0</span>
+            <span class="label">Hours</span>
+        </div>
+    
+        <div class="field">
+            <span class="value" data-value="mins">0</span>
+            <span class="label">Minutes</span>
+        </div>
+    
+        <div class="field">
+            <span class="value" data-value="secs">0</span>
+            <span class="label">Seconds</span>
+        </div>
+    </div>`;
+
+  insertHTML = (markUp) =>
+    document.querySelector('body').insertAdjacentHTML('afterbegin', markUp);
+
+  start = () => {
+    const markUp = this.template(this.timerId);
+
+    this.insertHTML(markUp);
+
+    const secs = document.querySelector('[data-value="secs"]');
+    const mins = document.querySelector('[data-value="mins"]');
+    const hours = document.querySelector('[data-value="hours"]');
+    const days = document.querySelector('[data-value="days"]');
+
+    const valueUpdate = (secsV, minsV, hoursV, daysV) => {
+      secs.textContent = secsV;
+      mins.textContent = minsV;
+      hours.textContent = hoursV;
+      days.textContent = daysV;
+    }
+
+    setInterval(() => {
+      const time = this.targetDate - Date.now();
+      const daysV = Math.floor(time / (1000 * 60 * 60 * 24));
+      const hoursV = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minsV = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
+      const secsV = Math.floor((time % (1000 * 60)) / 1000);
+
+      valueUpdate(secsV, minsV, hoursV, daysV);
+    }, 1000);
+  };
+};
+
+const timer1 = new CountdownTimer({
   selector: '#timer-1',
-  targetDate: new Date('Jul 17, 2019'),
+  targetDate: new Date('Jul 17, 2022'),
 });
 
-/*
- * Оставшиеся дни: делим значение UTC на 1000 * 60 * 60 * 24, количество
- * миллисекунд в одном дне (миллисекунды * секунды * минуты * часы)
- */
-const days = Math.floor(time / (1000 * 60 * 60 * 24));
+timer1.start();
 
-/*
- * Оставшиеся часы: получаем остаток от предыдущего расчета с помощью оператора
- * остатка % и делим его на количество миллисекунд в одном часе
- * (1000 * 60 * 60 = миллисекунды * минуты * секунды)
- */
-const hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+// const timer2 = new CountdownTimer({
+//   selector: '#timer-2',
+//   targetDate: new Date('Jul 17, 2021'),
+// });
 
-/*
- * Оставшиеся минуты: получаем оставшиеся минуты и делим их на количество
- * миллисекунд в одной минуте (1000 * 60 = миллисекунды * секунды)
- */
-const mins = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
-
-/*
- * Оставшиеся секунды: получаем оставшиеся секунды и делим их на количество
- * миллисекунд в одной секунде (1000)
- */
-const secs = Math.floor((time % (1000 * 60)) / 1000);
+// timer2.start();
